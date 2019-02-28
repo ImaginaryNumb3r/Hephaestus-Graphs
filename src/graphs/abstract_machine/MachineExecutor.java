@@ -10,6 +10,8 @@ import java.util.Iterator;
  */
 public interface MachineExecutor<Acc, Data> {
 
+    Data process(Iterable<Acc> inputStream, Data empty);
+
     default Data process(Acc[] inputStream, Data empty) {
         return process(Arrays.asList(inputStream), empty);
     }
@@ -17,7 +19,5 @@ public interface MachineExecutor<Acc, Data> {
     default Data process(Iterator<Acc> inputStream, Data empty) {
         return process(() -> inputStream, empty);
     }
-
-    Data process(Iterable<Acc> inputStream, Data empty);
 
 }

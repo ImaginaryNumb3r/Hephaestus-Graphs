@@ -125,6 +125,16 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
     }
 
     /**
+     * Stops the machine if the requirements are met. Also stops all supermachines.
+     */
+    public void addViolation(@NotNull ID stateId, @NotNull Predicate<ACC> condition) {
+        var state = getOrAdd(stateId);
+        var transition = TransitionFunction.ofViolation(state, (ch, buff) -> condition.test(ch));
+
+        state.addTransition(transition);
+    }
+
+    /**
      * Stops the machine if the requirements are met. Supermachines are not terminated.
      */
     public void addTermination(@NotNull ID stateId, @NotNull BiPredicate<ACC, DATA> condition) {

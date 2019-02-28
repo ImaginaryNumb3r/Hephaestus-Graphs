@@ -1,5 +1,8 @@
 package graphs.abstract_machine;
 
+import graphs.abstract_machine.exception.MachineTermination;
+import graphs.abstract_machine.exception.StateViolation;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,9 +32,8 @@ public class State<ACC, DATA> {
     public void addTransition(State< ACC, DATA> target, BiPredicate<ACC, DATA> condition, BiFunction<ACC, DATA, DATA> processing) {
         _transitions.add(TransitionFunction.ofStates(target, condition, processing));
     }
-    */
 
-    public State<ACC, DATA> transition(ACC input, DATA buffer) throws StateViolation {
+    public Transition<ACC, DATA> transition(ACC input, DATA buffer) throws StateViolation {
 
         try {
             for (TransitionFunction<ACC, DATA> transition : _transitions) {
@@ -42,9 +44,9 @@ public class State<ACC, DATA> {
                 }
             }
         } catch (MachineTermination ex) {
-            throw new StateTermination();
+
         }
 
         throw new StateViolation("Cannot reach final state");
-    }
+    }*/
 }

@@ -1,9 +1,9 @@
-package graphs.abstract_machine;
+package graphs.abstract_machine.exception;
 
 /**
  * @author Patrick Plieschnegger
  */
-public class StateViolation extends Exception {
+public class StateViolation extends RuntimeException {
 
     public StateViolation() {
         super();

@@ -1,4 +1,4 @@
-package graphs.abstract_machine;
+package graphs.abstract_machine.exception;
 
 /**
  * Creator: Patrick

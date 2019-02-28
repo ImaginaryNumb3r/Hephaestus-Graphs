@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
@@ -23,13 +22,6 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
 
         _states.put(initialIdentifier, initialState);
         _initialState = initialState;
-    }
-
-    // TODO: Remove state management.
-    public void addStates(ID... identifiers) {
-        for (ID id : identifiers) {
-            addState(id);
-        }
     }
 
     public AbstractMachine<ACC, DATA> construct() {
@@ -52,8 +44,8 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
                               @NotNull BiPredicate<ACC, DATA> condition,
                               @NotNull Accumulator<ACC, DATA> processing)
     {
-        var start = getOrThrow(startID);
-        var target = getOrThrow(targetID);
+        var start = getOrAdd(startID);
+        var target = getOrAdd(targetID);
         var transition = TransitionFunction.ofStates(target, condition, processing);
 
         start.addTransition(transition);
@@ -105,8 +97,8 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
                            @NotNull BiPredicate<ACC, DATA> condition,
                            @NotNull AbstractMachine<ACC, DATA> machine)
     {
-        var start = getOrThrow(startID);
-        var target = getOrThrow(targetID);
+        var start = getOrAdd(startID);
+        var target = getOrAdd(targetID);
         var transition = TransitionFunction.ofMachine(target, condition, machine);
 
         start.addTransition(transition);
@@ -126,7 +118,7 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
      * Stops the machine if the requirements are met. Also stops all supermachines.
      */
     public void addViolation(@NotNull ID stateId, @NotNull BiPredicate<ACC, DATA> condition) {
-        var state = getOrThrow(stateId);
+        var state = getOrAdd(stateId);
         var transition = TransitionFunction.ofViolation(state, condition);
 
         state.addTransition(transition);
@@ -136,7 +128,7 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
      * Stops the machine if the requirements are met. Supermachines are not terminated.
      */
     public void addTermination(@NotNull ID stateId, @NotNull BiPredicate<ACC, DATA> condition) {
-        var state = getOrThrow(stateId);
+        var state = getOrAdd(stateId);
         var transition = TransitionFunction.ofTermination(state, condition);
 
         state.addTransition(transition);
@@ -146,7 +138,7 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
      * Stops the machine if the requirements are met. Supermachines are not terminated.
      */
     public void addTermination(@NotNull ID stateId, @NotNull Predicate<ACC> condition) {
-        var state = getOrThrow(stateId);
+        var state = getOrAdd(stateId);
         var transition = TransitionFunction.ofTermination(state, (ch, buff) -> condition.test(ch));
 
         state.addTransition(transition);
@@ -157,10 +149,9 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
      * Throws exception if no state exists for the given ID.
      * TODO: Remove
      */
-    private State<ACC, DATA> getOrThrow(ID stateID) {
-        var state = _states.get(stateID);
-        if (state == null) throw new IllegalStateException("States must be declared before they are used in transitions.");
+    private State<ACC, DATA> getOrAdd(ID stateID) {
+        _states.putIfAbsent(stateID, new State<>());
 
-        return state;
+        return _states.get(stateID);
     }
 }

@@ -47,7 +47,6 @@ public class MachineExecutorImplBuilderTest {
         var removeWhitespaceMachine = builder.construct();
 
         builder = new AbstractMachineBuilder<>("start");
-        builder.addStates("start", "parsing", "fin");
 
         builder.addSoftTransition("start", "parsing", (ch) -> ch == '[');
         builder.addMachine("start", "fin", (ch) -> ch != '}', removeWhitespaceMachine);

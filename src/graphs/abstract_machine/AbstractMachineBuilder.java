@@ -24,7 +24,7 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
         _initialState = initialState;
     }
 
-    public AbstractMachine<ACC, DATA> construct() {
+    public MachineExecutor<ACC, DATA> construct() {
         if (_initialState == null) {
             throw new IllegalStateException("An initial state must be set before an abstract machine can be constructed.");
         }

@@ -1,15 +1,12 @@
 package graphs.abstract_machine;
 
-import graphs.abstract_machine.exception.MachineTermination;
-import graphs.abstract_machine.exception.StateViolation;
-
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Patrick Plieschnegger
  */
-public class State<ACC, DATA> {
+/*package*/ class State<ACC, DATA> {
     private final List<TransitionFunction<ACC, DATA>> _transitions;
 
     public State() {

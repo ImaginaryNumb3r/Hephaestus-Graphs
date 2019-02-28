@@ -28,7 +28,6 @@ public class AbstractMachine<Acc, Out> implements MachineExecutor<Acc, Out> {
         _inputStream = inputStream;
         _data = start;
 
-
         try {
             Iterator<Acc> iterator = inputStream.iterator();
             while (iterator.hasNext()) {

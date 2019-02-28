@@ -5,7 +5,7 @@ package graphs.abstract_machine;
  * Created: 27.02.2019
  * Purpose:
  */
-public class Transition<Acc, Data> {
+/*package*/ class Transition<Acc, Data> {
     public final State<Acc, Data> _state;
     public final Data _data;
 

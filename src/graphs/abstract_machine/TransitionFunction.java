@@ -13,7 +13,7 @@ import java.util.function.BiPredicate;
 /**
  * @author Patrick Plieschnegger
  */
-interface TransitionFunction<ACC, DATA> {
+/*package*/ interface TransitionFunction<ACC, DATA> {
 
     /**
      * @param input that must have at least one element remaining.

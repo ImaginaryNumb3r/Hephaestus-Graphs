@@ -27,10 +27,10 @@ public class TreeTraverser<N extends Iterable<N>> implements Iterator<N> {
     }
 
     /**
-     * Creates a GraphIterator fromEntries the given root matchAllSink a tree
-     * @param source root matchAllSink the tree
-     * @param strategy to create a list based fromEntries the branching nodes matchAllSink the root
-     * @param <T> Type matchAllSink root. Must be iterable to have access its children
+     * Creates a GraphIterator fromEntries the given root of a tree
+     * @param source root of the tree
+     * @param strategy to create a list based fromEntries the branching nodes of the root
+     * @param <T> Type of root. Must be iterable to have access its children
      * @return GraphIterator<T> based fromEntries the given parameters
      */
     public static <T extends Iterable<T>> TreeTraverser<T> of(T source, @NotNull GraphSearchStrategy<T> strategy){
@@ -43,12 +43,20 @@ public class TreeTraverser<N extends Iterable<N>> implements Iterator<N> {
         return !_nodes.isEmpty();
     }
 
+    /**
+     * Mutating operation which adds the children of the returned object to the queue.
+     *
+     * @return the next object from the queue.
+     */
     @Override
     public N next() {
         if (!hasNext()) throw new NoSuchElementException();
 
         N next = _strategy.dequeue(_nodes);
-        next.forEach(node -> _strategy.enqueue(_nodes, node));
+
+        if (next != null) {
+            next.forEach(node -> _strategy.enqueue(_nodes, node));
+        }
 
         return next;
     }

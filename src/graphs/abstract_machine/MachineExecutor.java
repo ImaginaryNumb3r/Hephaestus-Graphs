@@ -8,6 +8,7 @@ import java.util.Iterator;
  * Created: 28.02.2019
  * Purpose:
  */
+@FunctionalInterface
 public interface MachineExecutor<Acc, Data> {
 
     Data process(Iterable<Acc> inputStream, Data empty);

@@ -1,6 +1,5 @@
 package graphs.abstract_machine;
 
-import collections.iterator.Iterables;
 import graphs.abstract_machine.exception.MachineTermination;
 import graphs.abstract_machine.exception.StateViolation;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +28,7 @@ public class AbstractMachine<Acc, Out> implements MachineExecutor<Acc, Out> {
         _data = start;
 
         try {
-            Iterator<Acc> iterator = inputStream.iterator();
+            Iterator<Acc> iterator = _inputStream.iterator();
             while (iterator.hasNext()) {
                 var endPoint = transition(state, iterator, _data);
 
@@ -43,7 +42,10 @@ public class AbstractMachine<Acc, Out> implements MachineExecutor<Acc, Out> {
         return _data;
     }
 
-    private Transition<Acc, Out> transition(State<Acc, Out> state, Iterator<Acc> inputStream, Out buffer) throws StateViolation {
+    private Transition<Acc, Out> transition(State<Acc, Out> state,
+                                            Iterator<Acc> inputStream,
+                                            Out buffer
+    ) throws StateViolation {
         var transitions = state.getTransitions();
 
         for (TransitionFunction<Acc, Out> transition : transitions) {

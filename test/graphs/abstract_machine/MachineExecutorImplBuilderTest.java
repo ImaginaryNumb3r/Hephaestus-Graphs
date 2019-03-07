@@ -18,11 +18,17 @@ public class MachineExecutorImplBuilderTest {
         var startState = "start";
 
         builder.addReflection(startState,
-                Character::isWhitespace,
-                (ch, buff) -> buff);
-        builder.addReflection(startState,
-                (ch, buff) -> !Character.isWhitespace(ch),
+                (ch, buff) -> {
+                    boolean accept = !Character.isWhitespace(ch);
+                    return accept;
+                },
                 (ch, buff) -> buff + ch);
+        builder.addReflection(startState,
+                (ch, buff) -> {
+                    boolean accept = Character.isWhitespace(ch);
+                    return accept;
+                },
+                (ch, buff) -> buff);
 
         return builder;
     }
@@ -33,9 +39,15 @@ public class MachineExecutorImplBuilderTest {
         String expected = "abc[cc]fin";
         var machine = removeWhitespaceBuilder().construct();
 
+        boolean whitespace = Character.isWhitespace('[');
+        boolean whitespace1 = Character.isWhitespace('}');
+        boolean whitespace2 = Character.isWhitespace('{');
+        boolean whitespace3 = Character.isWhitespace('>');
+        boolean whitespace4 = Character.isWhitespace('<');
+
         String result = machine.process(() -> Iterators.of(string), "");
-        assertEquals(result, expected);
-    }
+        assertEquals(expected, result);
+    } /*
 
     @Test
     public void testParseBrackets() {
@@ -57,5 +69,5 @@ public class MachineExecutorImplBuilderTest {
 
         assertEquals(expected, result);
         System.out.println();
-    }
+    }*/
 }

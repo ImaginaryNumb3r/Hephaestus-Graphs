@@ -2,19 +2,22 @@ package graphs.abstract_machine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author Patrick Plieschnegger
  */
 /*package*/ class State<ACC, DATA> {
     private final List<TransitionFunction<ACC, DATA>> _transitions;
+    private final Object _id;
 
-    public State() {
-        _transitions = new ArrayList<>();
+    public State(Object id) {
+        this(new ArrayList<>(), id);
     }
 
-    public State(List<TransitionFunction<ACC, DATA>> transitions) {
+    public State(List<TransitionFunction<ACC, DATA>> transitions, Object id) {
         _transitions = transitions;
+        _id = id;
     }
 
     public List<TransitionFunction< ACC, DATA>> getTransitions() {
@@ -23,6 +26,19 @@ import java.util.List;
 
     public void addTransition(TransitionFunction<ACC, DATA> transition) {
         _transitions.add(transition);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (! (obj instanceof State)) return false;
+        State other = (State) obj;
+
+        return _id == other._id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(_id);
     }
 
     /*

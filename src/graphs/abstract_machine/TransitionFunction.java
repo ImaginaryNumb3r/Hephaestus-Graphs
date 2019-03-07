@@ -28,9 +28,10 @@ import java.util.function.BiPredicate;
 
         return (stream, buffer) -> {
             Optional<Transition<ACC, DATA>> optionalState = Optional.empty();
-            ACC input = stream.next();
+            ACC input = stream.next(); // TODO: Doesnt work because every check that might fail is also a mutating operation.
 
             if (condition.test(input, buffer)) {
+                // TODO: The Iterator should only
                 DATA data = processing.apply(input, buffer);
                 optionalState = Optional.of(new Transition<>(target, data));
             }

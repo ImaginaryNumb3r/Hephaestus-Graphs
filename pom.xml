@@ -35,7 +35,7 @@
         <dependency>
 			<groupId>com.github.ImaginaryNumb3r</groupId>
 			<artifactId>Hephaestus-collections</artifactId>
-			<version>master-SNAPSHOT</version>
+			<version>1.0.2</version>
         </dependency>
 	</dependencies>
 	<build>

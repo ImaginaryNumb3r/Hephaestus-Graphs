@@ -18,7 +18,7 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
 
     public AbstractMachineBuilder(ID initialIdentifier) {
         _states = new HashMap<>();
-        State<ACC, DATA> initialState = new State<>();
+        State<ACC, DATA> initialState = new State<>(initialIdentifier);
 
         _states.put(initialIdentifier, initialState);
         _initialState = initialState;
@@ -32,10 +32,7 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
         return new AbstractMachine<>(_initialState);
     }
 
-    public void addState(ID identifier) {
-        _states.putIfAbsent(identifier, new State<>());
-    }
-
+    //<editor-fold desc="Transitions">
     /**
      * Moves from the start state to the targeted state if the condition is met.
      * Processes the data via the specified function.
@@ -63,6 +60,32 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
     }
 
     /**
+     * Does not change the state if condition is met. Processes the data via the specified function.
+     */
+    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
+                           @NotNull BiPredicate<ACC, DATA> condition,
+                           @NotNull MachineExecutor<ACC, DATA> machine)
+    {
+        var start = getOrAdd(startID);
+        var target = getOrAdd(targetID);
+        var transition = TransitionFunction.ofMachine(target, condition, machine);
+
+        start.addTransition(transition);
+    }
+
+    /**
+     * Does not change the state if condition is met. Processes the data via the specified function.
+     */
+    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
+                           @NotNull Predicate<ACC> condition,
+                           @NotNull MachineExecutor<ACC, DATA> machine)
+    {
+        addMachine(startID, targetID, (ch, buff) -> condition.test(ch), machine);
+    }
+    //</editor-fold>
+
+    //<editor-fold desc="Soft Transitions">
+    /**
      * Moves from the start state to the targeted state if the condition is met.
      */
     public void addSoftTransition(@NotNull ID startID, @NotNull ID targetID, @NotNull Predicate<ACC> condition) {
@@ -75,7 +98,9 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
     public void addSoftTransition(@NotNull ID startID, @NotNull ID targetID, @NotNull BiPredicate<ACC, DATA> condition) {
         addTransition(startID, targetID, condition, (ch, buff) -> buff);
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Reflections">
     /**
      * Does not change the state if condition is met. Processes the data via the specified function.
      */
@@ -89,31 +114,9 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
     public void addReflection(@NotNull ID stateID, @NotNull Predicate<ACC> condition, @NotNull Accumulator<ACC, DATA> processing) {
         addTransition(stateID, stateID, (ch, buff) -> condition.test(ch), processing);
     }
+    //</editor-fold>
 
-    /**
-     * Does not change the state if condition is met. Processes the data via the specified function.
-     */
-    public void addMachine(@NotNull ID startID,@NotNull ID targetID,
-                           @NotNull BiPredicate<ACC, DATA> condition,
-                           @NotNull AbstractMachine<ACC, DATA> machine)
-    {
-        var start = getOrAdd(startID);
-        var target = getOrAdd(targetID);
-        var transition = TransitionFunction.ofMachine(target, condition, machine);
-
-        start.addTransition(transition);
-    }
-
-    /**
-     * Does not change the state if condition is met. Processes the data via the specified function.
-     */
-    public void addMachine(@NotNull ID startID,@NotNull ID targetID,
-                           @NotNull Predicate<ACC> condition,
-                           @NotNull AbstractMachine<ACC, DATA> machine)
-    {
-        addMachine(startID, targetID, (ch, buff) -> condition.test(ch), machine);
-    }
-
+    //<editor-fold desc="Violations and Terminations">
     /**
      * Stops the machine if the requirements are met. Also stops all supermachines.
      */
@@ -153,6 +156,7 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
 
         state.addTransition(transition);
     }
+    //</editor-fold>
 
     /**
      * Returns the corresponding state to the given ID.
@@ -160,7 +164,7 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
      * TODO: Remove
      */
     private State<ACC, DATA> getOrAdd(ID stateID) {
-        _states.putIfAbsent(stateID, new State<>());
+        _states.putIfAbsent(stateID, new State<>(stateID));
 
         return _states.get(stateID);
     }

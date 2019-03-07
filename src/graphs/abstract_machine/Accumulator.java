@@ -7,6 +7,7 @@ import java.util.function.BiFunction;
  * Created: 28.02.2019
  * Purpose:
  */
+@FunctionalInterface
 public interface Accumulator<Acc, Buffer> extends BiFunction<Acc, Buffer, Buffer> {
 
     default Buffer noOp(Acc acc, Buffer buffer) {

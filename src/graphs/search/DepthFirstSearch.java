@@ -6,7 +6,6 @@ import java.util.Deque;
  * @author Patrick
  * @since 02.05.2017
  */
-// TODO: Depth First doesn't work properly yet
 public class DepthFirstSearch<T> implements GraphSearchStrategy<T> {
 
     @Override

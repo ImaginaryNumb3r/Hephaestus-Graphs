@@ -13,61 +13,65 @@ import static org.junit.Assert.assertEquals;
  */
 public class MachineExecutorImplBuilderTest {
 
-    private AbstractMachineBuilder<String, Character, String> removeWhitespaceBuilder() {
-        var builder = new AbstractMachineBuilder<String, Character, String>("start");
-        var startState = "start";
+    private MachineExecutor<Character, String> removeWhitespaceBuilder() {
+        var startState = "ws_start";
+        var builder = new AbstractMachineBuilder<String, Character, String>(startState);
 
         builder.addReflection(startState,
-                (ch, buff) -> {
-                    boolean accept = !Character.isWhitespace(ch);
-                    return accept;
-                },
+                (ch) -> !Character.isWhitespace(ch),
                 (ch, buff) -> buff + ch);
-        builder.addReflection(startState,
-                (ch, buff) -> {
-                    boolean accept = Character.isWhitespace(ch);
-                    return accept;
-                },
-                (ch, buff) -> buff);
+        builder.setDefaultTransition(startState, (ch, buff) -> buff);
 
-        return builder;
+        return builder.construct();
     }
 
     @Test
     public void testClearWhiteSpaces() throws StateViolation {
-        String string = "abc [c c ] fi n";
-        String expected = "abc[cc]fin";
-        var machine = removeWhitespaceBuilder().construct();
-
-        boolean whitespace = Character.isWhitespace('[');
-        boolean whitespace1 = Character.isWhitespace('}');
-        boolean whitespace2 = Character.isWhitespace('{');
-        boolean whitespace3 = Character.isWhitespace('>');
-        boolean whitespace4 = Character.isWhitespace('<');
+        String string = "abc [c c ] de f";
+        String expected = "abc[cc]def";
+        var machine = removeWhitespaceBuilder();
 
         String result = machine.process(() -> Iterators.of(string), "");
         assertEquals(expected, result);
-    } /*
+    }
 
     @Test
-    public void testParseBrackets() {
-        String string = "abc [c c ] fi n";
+    public void testParseBrackets() throws StateViolation {
+        String input = "abc [c c ] de f";
         String expected = "cc";
+        checktParseBrackets(expected, input);
 
-        var builder = removeWhitespaceBuilder();
-        builder.addTermination("start", ch -> ch == ']');
-        var removeWhitespaceMachine = builder.construct();
+        input = "abc [c c ] d[]e [f]";
+        expected = "ccf";
+        checktParseBrackets(expected, input);
 
-        builder = new AbstractMachineBuilder<>("start");
+        input = "abc c c  de f";
+        expected = "";
+        checktParseBrackets(expected, input);
 
-        builder.addSoftTransition("start", "parsing", (ch) -> ch == '[');
-        builder.addMachine("start", "fin", (ch) -> ch != '}', removeWhitespaceMachine);
-        builder.addTermination("fin", (ch) -> true);
+        input = "";
+        expected = "";
+        checktParseBrackets(expected, input);
+    }
+
+    public void checktParseBrackets(String expected, String input) throws StateViolation {
+        String startState = "start";
+        String parsingState = "parsing";
+
+        var builder = new AbstractMachineBuilder<String, Character, String>(startState);
+
+        builder.addTransition(startState, parsingState, (ch) -> ch == '[', (ch, buff) -> buff);
+        builder.setDefaultTransition(startState, (ch, buff) -> buff);
+
+        builder.addTransition(parsingState, startState, (ch) -> ch == ']', (ch, buff) -> buff);
+        builder.addReflection(parsingState,
+                (ch) -> !Character.isWhitespace(ch),
+                (ch, buff) -> buff + ch);
+        builder.setDefaultTransition(parsingState, (ch, buff) -> buff);
 
         var machine = builder.construct();
-        final String result = machine.process(Iterators.of(string), "");
 
+        String result = machine.process(() -> Iterators.of(input), "");
         assertEquals(expected, result);
-        System.out.println();
-    }*/
+    }
 }

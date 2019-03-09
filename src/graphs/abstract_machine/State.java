@@ -9,6 +9,7 @@ import java.util.Objects;
  */
 /*package*/ class State<ACC, DATA> {
     private final List<TransitionFunction<ACC, DATA>> _transitions;
+    private TransitionFunction<ACC, DATA> _hardTransition;
     private final Object _id;
 
     public State(Object id) {
@@ -28,6 +29,18 @@ import java.util.Objects;
         _transitions.add(transition);
     }
 
+    public void setDefaultTransition(TransitionFunction<ACC, DATA> transition) {
+        _hardTransition = transition;
+    }
+
+    public TransitionFunction<ACC, DATA> getHardTransition() {
+        return _hardTransition ;
+    }
+
+    public boolean hasHardTransition() {
+        return _hardTransition != null;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (! (obj instanceof State)) return false;
@@ -39,6 +52,11 @@ import java.util.Objects;
     @Override
     public int hashCode() {
         return Objects.hash(_id);
+    }
+
+    @Override
+    public String toString() {
+        return "State: " + _id;
     }
 
     /*

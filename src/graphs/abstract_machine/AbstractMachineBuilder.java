@@ -1,5 +1,6 @@
 package graphs.abstract_machine;
 
+import essentials.functional.Predicates;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -10,7 +11,7 @@ import java.util.function.Predicate;
 /**
  * Creator: Patrick
  * Created: 27.02.2019
- * Purpose:
+ * TODO: We should expose the state directly and give more direct control over it. This allows to change the order of transitions.
  */
 public class AbstractMachineBuilder<ID, ACC, DATA> {
     private final Map<ID, State<ACC, DATA>> _states;
@@ -58,30 +59,6 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
     {
         addTransition(startID, targetID, (ch, buff) -> condition.test(ch), processing);
     }
-
-    /**
-     * Does not change the state if condition is met. Processes the data via the specified function.
-     */
-    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
-                           @NotNull BiPredicate<ACC, DATA> condition,
-                           @NotNull MachineExecutor<ACC, DATA> machine)
-    {
-        var start = getOrAdd(startID);
-        var target = getOrAdd(targetID);
-        var transition = TransitionFunction.ofMachine(target, condition, machine);
-
-        start.addTransition(transition);
-    }
-
-    /**
-     * Does not change the state if condition is met. Processes the data via the specified function.
-     */
-    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
-                           @NotNull Predicate<ACC> condition,
-                           @NotNull MachineExecutor<ACC, DATA> machine)
-    {
-        addMachine(startID, targetID, (ch, buff) -> condition.test(ch), machine);
-    }
     //</editor-fold>
 
     //<editor-fold desc="Soft Transitions">
@@ -113,6 +90,24 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
      */
     public void addReflection(@NotNull ID stateID, @NotNull Predicate<ACC> condition, @NotNull Accumulator<ACC, DATA> processing) {
         addTransition(stateID, stateID, (ch, buff) -> condition.test(ch), processing);
+    }
+
+    /**
+     * Does not change the state if condition is met. Processes the data via the specified function.
+     */
+    public void setDefaultTransition(@NotNull ID stateID, @NotNull Accumulator<ACC, DATA> processing) {
+        setDefaultTransition(stateID, stateID, processing);
+    }
+
+    /**
+     * Does not change the state if condition is met. Processes the data via the specified function.
+     */
+    public void setDefaultTransition(@NotNull ID startID, @NotNull ID targetID, @NotNull Accumulator<ACC, DATA> processing) {
+        var start = getOrAdd(startID);
+        var target = getOrAdd(targetID);
+        var transition = TransitionFunction.defaultTransition(target, processing);
+
+        start.setDefaultTransition(transition);
     }
     //</editor-fold>
 
@@ -156,16 +151,70 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
 
         state.addTransition(transition);
     }
+
+    /**
+     * Stops the machine if the requirements are met. Supermachines are not terminated.
+     */
+    public void addTermination(@NotNull ID stateId) {
+        var state = getOrAdd(stateId);
+        var transition = TransitionFunction.ofTermination(state, Predicates::alwaysTrue);
+
+        state.addTransition(transition);
+    }
     //</editor-fold>
 
     /**
      * Returns the corresponding state to the given ID.
      * Throws exception if no state exists for the given ID.
-     * TODO: Remove
      */
     private State<ACC, DATA> getOrAdd(ID stateID) {
         _states.putIfAbsent(stateID, new State<>(stateID));
 
         return _states.get(stateID);
     }
+
+
+
+
+    /*
+    //<editor-fold desc="Sub Machines">
+    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
+                           @NotNull BiPredicate<ACC, DATA> enterCondition,
+                           @NotNull MachineExecutor<ACC, DATA> machine)
+    {
+        var start = getOrAdd(startID);
+        var target = getOrAdd(targetID);
+        var transition = TransitionFunction.ofMachine(target, enterCondition, null, machine);
+
+        start.addTransition(transition);
+    }
+
+    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
+                           @NotNull Predicate<ACC> enterCondition,
+                           @NotNull MachineExecutor<ACC, DATA> machine)
+    {
+        addMachine(startID, targetID, (ch, buff) -> enterCondition.test(ch), machine);
+    }
+
+    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
+                           @NotNull BiPredicate<ACC, DATA> condition,
+                           @NotNull BiPredicate<ACC, DATA> exitCondition,
+                           @NotNull MachineExecutor<ACC, DATA> machine)
+    {
+        var start = getOrAdd(startID);
+        var target = getOrAdd(targetID);
+        var transition = TransitionFunction.ofMachine(target, condition, null, machine);
+
+        start.addTransition(transition);
+    }
+
+    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
+                           @NotNull Predicate<ACC> enterCondition,
+                           @NotNull Predicate<ACC> exitCondition,
+                           @NotNull MachineExecutor<ACC, DATA> machine)
+    {
+        addMachine(startID, targetID, (ch, buff) -> enterCondition.test(ch), machine);
+    }
+    //</editor-fold>
+    */
 }

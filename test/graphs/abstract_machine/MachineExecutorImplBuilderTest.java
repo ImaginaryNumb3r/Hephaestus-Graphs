@@ -39,22 +39,22 @@ public class MachineExecutorImplBuilderTest {
     public void testParseBrackets() throws StateViolation {
         String input = "abc [c c ] de f";
         String expected = "cc";
-        checktParseBrackets(expected, input);
+        checkParseBrackets(expected, input);
 
         input = "abc [c c ] d[]e [f]";
         expected = "ccf";
-        checktParseBrackets(expected, input);
+        checkParseBrackets(expected, input);
 
         input = "abc c c  de f";
         expected = "";
-        checktParseBrackets(expected, input);
+        checkParseBrackets(expected, input);
 
         input = "";
         expected = "";
-        checktParseBrackets(expected, input);
+        checkParseBrackets(expected, input);
     }
 
-    public void checktParseBrackets(String expected, String input) throws StateViolation {
+    public void checkParseBrackets(String expected, String input) throws StateViolation {
         String startState = "start";
         String parsingState = "parsing";
 

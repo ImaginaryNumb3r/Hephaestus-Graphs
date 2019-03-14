@@ -18,7 +18,7 @@ import java.util.function.BiPredicate;
      * @param input that must have at least one element remaining.
      * @return empty optional if the transition was not applicable.
      */
-    Optional<Transition<ACC, DATA>> utilize(BufferQueue<ACC> input, DATA buffer);
+    Optional<Transition<ACC, DATA>> utilize(BufferQueue<ACC> input, DATA buffer) throws RuntimeException;
 
     static <ACC, DATA> TransitionFunction<ACC, DATA> ofStates(State<ACC, DATA> target,
                                                                      BiPredicate<ACC, DATA> condition,

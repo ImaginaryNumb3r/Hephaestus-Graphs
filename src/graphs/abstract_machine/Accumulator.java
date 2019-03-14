@@ -10,6 +10,8 @@ import java.util.function.BiFunction;
 @FunctionalInterface
 public interface Accumulator<Acc, Buffer> extends BiFunction<Acc, Buffer, Buffer> {
 
+    Buffer apply(Acc t, Buffer u) throws RuntimeException;
+
     default Buffer noOp(Acc acc, Buffer buffer) {
         return buffer;
     }

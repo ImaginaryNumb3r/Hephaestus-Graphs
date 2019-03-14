@@ -33,6 +33,11 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
         return new AbstractMachine<>(_initialState);
     }
 
+    protected State<ACC, DATA> getInitialState() {
+        return _initialState;
+    }
+
+
     //<editor-fold desc="Transitions">
     /**
      * Moves from the start state to the targeted state if the condition is met.

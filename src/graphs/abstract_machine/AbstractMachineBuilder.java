@@ -64,11 +64,24 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
     {
         addTransition(startID, targetID, (ch, buff) -> condition.test(ch), processing);
     }
-    //</editor-fold>
 
-    //<editor-fold desc="Soft Transitions">
     /**
-     * Moves from the start state to the targeted state if the condition is met.
+     * Always moves from the start state to the targeted state.
+     * Processes the data via the specified function.
+     */
+    public void addHardTransition(@NotNull ID startID, @NotNull ID targetID,
+                                  @NotNull Accumulator<ACC, DATA> processing)
+    {
+        var start = getOrAdd(startID);
+        var target = getOrAdd(targetID);
+        var transition = TransitionFunction.ofStates(target, (ch, buff) -> true, processing);
+
+        start.addTransition(transition);
+    }
+
+    /**
+     * Always moves from the start state to the targeted state.
+     * Processes the data via the specified function.
      */
     public void addSoftTransition(@NotNull ID startID, @NotNull ID targetID, @NotNull Predicate<ACC> condition) {
         addTransition(startID, targetID, (ch, buff) -> condition.test(ch), (ch, buff) -> buff);
@@ -95,6 +108,20 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
      */
     public void addReflection(@NotNull ID stateID, @NotNull Predicate<ACC> condition, @NotNull Accumulator<ACC, DATA> processing) {
         addTransition(stateID, stateID, (ch, buff) -> condition.test(ch), processing);
+    }
+
+    /**
+     * Does not change the state if condition is met. Does not perform any processing on the data.
+     */
+    public void addSoftReflection(@NotNull ID stateID, @NotNull BiPredicate<ACC, DATA> condition) {
+        addTransition(stateID, stateID, condition, (ch, buff) -> buff);
+    }
+
+    /**
+     * Does not change the state if condition is met. Does not perform any processing on the data.
+     */
+    public void addSoftReflection(@NotNull ID stateID, @NotNull Predicate<ACC> condition) {
+        addTransition(stateID, stateID, (ch, buff) -> condition.test(ch), (ch, buff) -> buff);
     }
 
     /**

@@ -14,18 +14,11 @@ import java.util.function.BiPredicate;
 @FunctionalInterface
 public interface MachineExecutor<Acc, Data> {
 
-    Data process(BufferQueue<Acc> inputStream, Data empty);
-
     default Data process(BufferQueue<Acc> inputStream, Data empty, BiPredicate<Acc, Data> terminationCondition) {
         throw new NoImplementationException();
     }
 
-    default Data process(Iterable<Acc> inputStream, Data empty) {
-        var iterator = inputStream.iterator();
-        final var queue = new BufferQueue<>(100, iterator);
-
-        return process(queue, empty);
-    }
+    Data process(Iterable<Acc> inputStream, Data empty);
 
     default Data process(Acc[] inputStream, Data empty) {
         return process(Arrays.asList(inputStream), empty);

@@ -15,8 +15,6 @@ import java.util.Optional;
  */
 public class AbstractMachine<Acc, Out> implements MachineExecutor<Acc, Out> {
     private final State<Acc, Out> _initialState;
-    private BufferQueue<Acc> inputQueue;
-    private Out _data;
 
     protected AbstractMachine(@NotNull State<Acc, Out> initialState) {
         _initialState = initialState;
@@ -26,23 +24,22 @@ public class AbstractMachine<Acc, Out> implements MachineExecutor<Acc, Out> {
      * While the method is running, the backing input must not be mutated.
      * @throws java.util.ConcurrentModificationException if the input iterable was mutated while this method is executing.
      */
-    public Out process(BufferQueue<Acc> bufferQueue, Out start) {
+    public Out process(Iterable<Acc> queue, Out start) {
         State<Acc, Out> state = _initialState;
-        inputQueue = bufferQueue;
-        _data = start;
+        Out data = start;
 
         try {
-            while (inputQueue.hasNext()) {
-                var endPoint = transition(state, inputQueue, _data);
+            for (Acc input : queue) {
+                var endPoint = transition(state, input, data);
 
                 state = endPoint._state;
-                _data = endPoint._data;
+                data = endPoint._data;
             }
         } catch (MachineTermination fin) {
             // Terminate machine and return the data that was computed so far.
         }
 
-        return _data;
+        return data;
     }
 
     /**
@@ -50,14 +47,13 @@ public class AbstractMachine<Acc, Out> implements MachineExecutor<Acc, Out> {
      * @throws StateViolation if no transition to another state is possible.
      */
     private Transition<Acc, Out> transition(State<Acc, Out> state,
-                                            BufferQueue<Acc> inputStream,
+                                            Acc input,
                                             Out buffer
     ) throws StateViolation {
         var transitions = state.getTransitions();
-        String s = state.toString();
 
         for (TransitionFunction<Acc, Out> transition : transitions) {
-            var endPoint = transition.utilize(inputStream, buffer);
+            var endPoint = transition.utilize(input, buffer);
 
             if (endPoint.isPresent()) {
                 return endPoint.get();
@@ -65,17 +61,14 @@ public class AbstractMachine<Acc, Out> implements MachineExecutor<Acc, Out> {
         }
 
         // If all normal transitions are exhausted, use the hard transition as default fallback.
-        return resolveFallback(state, inputStream, buffer);
+        return resolveFallback(state, input, buffer);
 
     }
 
-    private Transition<Acc, Out> resolveFallback(State<Acc, Out> state,
-                                                 BufferQueue<Acc> inputStream,
-                                                 Out buffer
-    ) {
+    private Transition<Acc, Out> resolveFallback(State<Acc, Out> state, Acc input, Out buffer) {
         if (state.hasHardTransition()) {
             var fallback = state.getHardTransition();
-            Optional<Transition<Acc, Out>> endPoint = fallback.utilize(inputStream, buffer);
+            Optional<Transition<Acc, Out>> endPoint = fallback.utilize(input, buffer);
 
             if (endPoint.isPresent()) {
                 return endPoint.get();

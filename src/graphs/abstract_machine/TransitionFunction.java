@@ -18,7 +18,7 @@ import java.util.function.BiPredicate;
      * @param input that must have at least one element remaining.
      * @return empty optional if the transition was not applicable.
      */
-    Optional<Transition<ACC, DATA>> utilize(BufferQueue<ACC> input, DATA buffer) throws RuntimeException;
+    Optional<Transition<ACC, DATA>> utilize(ACC input, DATA buffer) throws RuntimeException;
 
     static <ACC, DATA> TransitionFunction<ACC, DATA> ofStates(State<ACC, DATA> target,
                                                                      BiPredicate<ACC, DATA> condition,
@@ -26,15 +26,12 @@ import java.util.function.BiPredicate;
     ) {
         Contract.checkNulls(target, condition, processing);
 
-        return (queue, buffer) -> {
+        return (input, buffer) -> {
             Optional<Transition<ACC, DATA>> state = Optional.empty();
-            ACC input = queue.peek();
 
             if (condition.test(input, buffer)) {
                 DATA data = processing.apply(input, buffer);
                 state = Optional.of(new Transition<>(target, data));
-
-                queue.pop();
             }
 
             return state;
@@ -46,9 +43,8 @@ import java.util.function.BiPredicate;
     ) {
         Contract.checkNulls(target, processing);
 
-        return (queue, buffer) -> {
+        return (input, buffer) -> {
             Optional<Transition<ACC, DATA>> state;
-            ACC input = queue.pop();
 
             DATA data = processing.apply(input, buffer);
             state = Optional.of(new Transition<>(target, data));
@@ -60,8 +56,7 @@ import java.util.function.BiPredicate;
     static <ACC, DATA> TransitionFunction<ACC, DATA> ofViolation(@NotNull State<ACC, DATA> source, @NotNull BiPredicate<ACC, DATA> condition) {
         Contract.checkNulls(source, condition);
 
-        return (queue, buffer) -> {
-            ACC input = queue.peek();
+        return (input, buffer) -> {
 
             if (condition.test(input, buffer)) {
                 throw new StateViolation();
@@ -76,8 +71,7 @@ import java.util.function.BiPredicate;
     ) {
         Contract.checkNulls(source, condition);
 
-        return (queue, buffer) -> {
-            ACC input = queue.peek();
+        return (input, buffer) -> {
 
             if (condition.test(input, buffer)) {
                 throw new MachineTermination();

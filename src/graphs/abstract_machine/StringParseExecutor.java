@@ -19,6 +19,6 @@ public interface StringParseExecutor extends MachineExecutor<Character, StringBu
         return process(inputStream, new StringBuilder()).toString();
     }
 
-    StringBuilder process(BufferQueue<Character> inputStream, StringBuilder empty);
+    StringBuilder process(Iterable<Character> inputStream, StringBuilder empty);
 
 }

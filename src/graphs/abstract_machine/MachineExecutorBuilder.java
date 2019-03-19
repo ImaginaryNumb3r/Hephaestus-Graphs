@@ -11,13 +11,13 @@ import java.util.function.Predicate;
 /**
  * Creator: Patrick
  * Created: 27.02.2019
- * TODO: We should expose the state directly and give more direct control over it. This allows to change the order of transitions.
+ * TODO: We should consider exposing the state directly and give more direct control over it. This allows to change the order of transitions.
  */
-public class AbstractMachineBuilder<ID, ACC, DATA> {
+public class MachineExecutorBuilder<ID, ACC, DATA> {
     private final Map<ID, State<ACC, DATA>> _states;
     private State<ACC, DATA> _initialState;
 
-    public AbstractMachineBuilder(ID initialIdentifier) {
+    public MachineExecutorBuilder(ID initialIdentifier) {
         _states = new HashMap<>();
         State<ACC, DATA> initialState = new State<>(initialIdentifier);
 
@@ -25,12 +25,29 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
         _initialState = initialState;
     }
 
+    @Deprecated
     public MachineExecutor<ACC, DATA> construct() {
         if (_initialState == null) {
             throw new IllegalStateException("An initial state must be set before an abstract machine can be constructed.");
         }
 
-        return new AbstractMachine<>(_initialState);
+        return new AbstractPullMachine<>(_initialState);
+    }
+
+    public MachineExecutor<ACC, DATA> buildExecutor() {
+        if (_initialState == null) {
+            throw new IllegalStateException("An initial state must be set before an abstract machine can be constructed.");
+        }
+
+        return new AbstractPullMachine<>(_initialState);
+    }
+
+    public PushdownAutomaton<ACC, DATA> buildPushdown(DATA empty) {
+        if (_initialState == null) {
+            throw new IllegalStateException("An initial state must be set before an abstract machine can be constructed.");
+        }
+
+        return new AbstractPushMachine<>(_initialState, empty);
     }
 
     protected State<ACC, DATA> getInitialState() {

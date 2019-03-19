@@ -11,27 +11,37 @@ import static org.junit.Assert.assertEquals;
  * Created: 28.02.2019
  * Purpose:
  */
-public class MachineExecutorImplBuilderTest {
+public class MachineExecutorBuilderTest {
 
-    private MachineExecutor<Character, String> removeWhitespaceBuilder() {
+    private MachineExecutorBuilder<String, Character, String> removeWhitespaceBuilder() {
         var startState = "ws_start";
-        var builder = new AbstractMachineBuilder<String, Character, String>(startState);
+        var builder = new MachineExecutorBuilder<String, Character, String>(startState);
 
         builder.addReflection(startState,
                 (ch) -> !Character.isWhitespace(ch),
                 (ch, buff) -> buff + ch);
         builder.setDefaultTransition(startState, (ch, buff) -> buff);
 
-        return builder.construct();
+        return builder;
     }
 
     @Test
     public void testClearWhiteSpaces() throws StateViolation {
         String string = "abc [c c ] de f";
         String expected = "abc[cc]def";
-        var machine = removeWhitespaceBuilder();
+        var machine = removeWhitespaceBuilder().buildExecutor();
+        var automaton = removeWhitespaceBuilder().buildPushdown("");
 
+        // Test Executor.
         String result = machine.process(() -> Iterators.of(string), "");
+        assertEquals(expected, result);
+
+        // Test Automaton.
+        for (byte b : string.getBytes()) {
+            char ch = (char) b;
+            automaton.process(ch);
+        }
+        result = automaton.getData();
         assertEquals(expected, result);
     }
 
@@ -58,7 +68,7 @@ public class MachineExecutorImplBuilderTest {
         String startState = "start";
         String parsingState = "parsing";
 
-        var builder = new AbstractMachineBuilder<String, Character, String>(startState);
+        var builder = new MachineExecutorBuilder<String, Character, String>(startState);
 
         builder.addTransition(startState, parsingState, (ch) -> ch == '[', (ch, buff) -> buff);
         builder.setDefaultTransition(startState, (ch, buff) -> buff);
@@ -69,9 +79,17 @@ public class MachineExecutorImplBuilderTest {
                 (ch, buff) -> buff + ch);
         builder.setDefaultTransition(parsingState, (ch, buff) -> buff);
 
-        var machine = builder.construct();
+        var executor = builder.buildExecutor();
+        var automaton = builder.buildPushdown("");
 
-        String result = machine.process(() -> Iterators.of(input), "");
+        String result = executor.process(() -> Iterators.of(input), "");
+        assertEquals(expected, result);
+
+        for (byte b : input.getBytes()) {
+            char ch = (char) b;
+            automaton.process(ch);
+        }
+        result = automaton.getData();
         assertEquals(expected, result);
     }
 }

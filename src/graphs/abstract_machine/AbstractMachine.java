@@ -13,40 +13,18 @@ import java.util.Optional;
  * Created: 26.02.2019
  * Purpose:
  */
-public class AbstractMachine<Acc, Out> implements MachineExecutor<Acc, Out> {
-    private final State<Acc, Out> _initialState;
+public abstract class AbstractMachine<Acc, Out> {
+    protected final State<Acc, Out> _initialState;
 
     protected AbstractMachine(@NotNull State<Acc, Out> initialState) {
         _initialState = initialState;
     }
 
     /**
-     * While the method is running, the backing input must not be mutated.
-     * @throws java.util.ConcurrentModificationException if the input iterable was mutated while this method is executing.
-     */
-    public Out process(Iterable<Acc> queue, Out start) {
-        State<Acc, Out> state = _initialState;
-        Out data = start;
-
-        try {
-            for (Acc input : queue) {
-                var endPoint = transition(state, input, data);
-
-                state = endPoint._state;
-                data = endPoint._data;
-            }
-        } catch (MachineTermination fin) {
-            // Terminate machine and return the data that was computed so far.
-        }
-
-        return data;
-    }
-
-    /**
      * @return always returns a transition, never returns null.
      * @throws StateViolation if no transition to another state is possible.
      */
-    private Transition<Acc, Out> transition(State<Acc, Out> state,
+    protected Transition<Acc, Out> transition(State<Acc, Out> state,
                                             Acc input,
                                             Out buffer
     ) throws StateViolation {
@@ -62,10 +40,9 @@ public class AbstractMachine<Acc, Out> implements MachineExecutor<Acc, Out> {
 
         // If all normal transitions are exhausted, use the hard transition as default fallback.
         return resolveFallback(state, input, buffer);
-
     }
 
-    private Transition<Acc, Out> resolveFallback(State<Acc, Out> state, Acc input, Out buffer) {
+    protected Transition<Acc, Out> resolveFallback(State<Acc, Out> state, Acc input, Out buffer) {
         if (state.hasHardTransition()) {
             var fallback = state.getHardTransition();
             Optional<Transition<Acc, Out>> endPoint = fallback.utilize(input, buffer);

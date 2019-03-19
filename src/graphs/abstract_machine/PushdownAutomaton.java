@@ -7,9 +7,9 @@ public interface PushdownAutomaton <Acc, Data> {
 
     Status process(Acc input);
 
-    Data finish();
+    Data getData();
 
     enum Status {
-        RUNNING, HALTED, TERMINATED
+        RUNNING, HALTED, VIOLATED
     }
 }

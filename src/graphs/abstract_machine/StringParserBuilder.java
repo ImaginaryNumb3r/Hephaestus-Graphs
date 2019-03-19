@@ -3,7 +3,7 @@ package graphs.abstract_machine;
 /**
  * @author Patrick Plieschnegger
  */
-public class StringParserBuilder<ID> extends AbstractMachineBuilder<ID, Character, StringBuilder> {
+public class StringParserBuilder<ID> extends MachineExecutorBuilder<ID, Character, StringBuilder> {
 
     public StringParserBuilder(ID initialIdentifier) {
         super(initialIdentifier);

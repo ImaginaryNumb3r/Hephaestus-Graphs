@@ -10,7 +10,6 @@ import java.util.Iterator;
 /**
  * Creator: Patrick
  * Created: 07.03.2019
- * Purpose:
  */
 @Package class BufferQueue<T> implements Iterable<T>{
     protected final int _bufferSize;

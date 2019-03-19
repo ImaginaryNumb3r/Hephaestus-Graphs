@@ -10,7 +10,11 @@ public class StringParserBuilder<ID> extends MachineExecutorBuilder<ID, Characte
     }
 
     @Override
-    public StringParseExecutor construct() {
-        return new StringParser(getInitialState());
+    public StringParseExecutor buildExecutor() {
+        return new StringExecutor(getInitialState());
+    }
+
+    public StringParseAutomaton buildPushdown() {
+        return new StringAutomaton(getInitialState(), new StringBuilder());
     }
 }

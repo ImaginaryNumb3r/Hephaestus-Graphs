@@ -4,9 +4,6 @@ import graphs.abstract_machine.exception.MachineTermination;
 import graphs.abstract_machine.exception.StateViolation;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
  * Creator: Patrick
  * Created: 19.03.2019

@@ -1,5 +1,6 @@
 package graphs.abstract_machine;
 
+import essentials.annotations.Package;
 import graphs.abstract_machine.exception.MachineTermination;
 import org.jetbrains.annotations.NotNull;
 

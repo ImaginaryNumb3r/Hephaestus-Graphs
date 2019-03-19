@@ -204,49 +204,4 @@ public class AbstractMachineBuilder<ID, ACC, DATA> {
 
         return _states.get(stateID);
     }
-
-
-
-
-    /*
-    //<editor-fold desc="Sub Machines">
-    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
-                           @NotNull BiPredicate<ACC, DATA> enterCondition,
-                           @NotNull MachineExecutor<ACC, DATA> machine)
-    {
-        var start = getOrAdd(startID);
-        var target = getOrAdd(targetID);
-        var transition = TransitionFunction.ofMachine(target, enterCondition, null, machine);
-
-        start.addTransition(transition);
-    }
-
-    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
-                           @NotNull Predicate<ACC> enterCondition,
-                           @NotNull MachineExecutor<ACC, DATA> machine)
-    {
-        addMachine(startID, targetID, (ch, buff) -> enterCondition.test(ch), machine);
-    }
-
-    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
-                           @NotNull BiPredicate<ACC, DATA> condition,
-                           @NotNull BiPredicate<ACC, DATA> exitCondition,
-                           @NotNull MachineExecutor<ACC, DATA> machine)
-    {
-        var start = getOrAdd(startID);
-        var target = getOrAdd(targetID);
-        var transition = TransitionFunction.ofMachine(target, condition, null, machine);
-
-        start.addTransition(transition);
-    }
-
-    public void addMachine(@NotNull ID startID, @NotNull ID targetID,
-                           @NotNull Predicate<ACC> enterCondition,
-                           @NotNull Predicate<ACC> exitCondition,
-                           @NotNull MachineExecutor<ACC, DATA> machine)
-    {
-        addMachine(startID, targetID, (ch, buff) -> enterCondition.test(ch), machine);
-    }
-    //</editor-fold>
-    */
 }

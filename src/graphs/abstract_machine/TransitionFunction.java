@@ -41,28 +41,6 @@ import java.util.function.BiPredicate;
         };
     }
 
-    static <ACC, DATA> TransitionFunction<ACC, DATA> ofMachine(State<ACC, DATA> target,
-                                                               BiPredicate<ACC, DATA> enterCondition,
-                                                               BiPredicate<ACC, DATA> exitCondition,
-                                                               MachineExecutor<ACC, DATA> machine)
-    {
-        Contract.checkNulls(target, enterCondition, exitCondition, machine);
-
-        return  (queue, buffer) -> {
-            Optional<Transition<ACC, DATA>> state = Optional.empty();
-            ACC input = queue.peek();
-
-            if (enterCondition.test(input, buffer)) {
-                DATA data = machine.process(queue, buffer);
-                state = Optional.of(new Transition<>(target, data));
-
-                // input element is not removed from queue as this wil be done in the machine itself.
-            }
-
-            return state;
-        };
-    }
-
     static <ACC, DATA> TransitionFunction<ACC, DATA> defaultTransition(State<ACC, DATA> target,
                                                                        Accumulator<ACC, DATA> processing
     ) {

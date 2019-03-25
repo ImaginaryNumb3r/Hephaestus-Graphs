@@ -50,6 +50,14 @@ public class TreeTraverser<N> implements Iterator<N> {
         return new TreeTraverser<>(source, broadcaster, strategy);
     }
 
+    public static <T> TreeTraverser<T> of(@Nullable  T source,
+                                          @NotNull BroadCaster<T> broadcaster,
+                                          @NotNull GraphSearchStrategy<T> strategy
+    ){
+        Contract.checkNulls(strategy, broadcaster);
+        return new TreeTraverser<>(source, broadcaster.andThen(Iterable::iterator), strategy);
+    }
+
     @Override
     public boolean hasNext() {
         return !_nodes.isEmpty();

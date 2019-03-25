@@ -1,6 +1,5 @@
 package graphs.abstract_machine;
 
-import graphs.abstract_machine.exception.MachineTermination;
 import graphs.abstract_machine.exception.StateViolation;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,6 +12,7 @@ import java.util.Optional;
  * Created: 26.02.2019
  * Purpose:
  */
+@SuppressWarnings("WeakerAccess")
 public abstract class AbstractMachine<Acc, Out> {
     protected final State<Acc, Out> _initialState;
 

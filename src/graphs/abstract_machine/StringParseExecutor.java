@@ -10,13 +10,8 @@ public interface StringParseExecutor extends MachineExecutor<Character, StringBu
 
     default String process(CharSequence charSequence) {
         var stringIter = StringIterator.of(charSequence);
-        var bufferQueue = new BufferQueue<>(100, stringIter);
 
-        return process(bufferQueue, new StringBuilder()).toString();
-    }
-
-    default String process(BufferQueue<Character> inputStream) {
-        return process(inputStream, new StringBuilder()).toString();
+        return process(stringIter, new StringBuilder()).toString();
     }
 
     StringBuilder process(Iterable<Character> inputStream, StringBuilder empty);

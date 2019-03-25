@@ -3,21 +3,25 @@ package graphs.search;
 import essentials.contract.Contract;
 import essentials.util.HashGenerator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author Patrick
  * @since 01.05.2017
  */
 @SuppressWarnings("WeakerAccess")
-public class TreeTraverser<N extends Iterable<N>> implements Iterator<N> {
+public class TreeTraverser<N> implements Iterator<N> {
     protected final GraphSearchStrategy<N> _strategy;
     protected final Deque<N> _nodes;
     protected final N _root;
+    protected final Function<N, Iterator<N>> _broadcaster;
     protected N _current;
 
-    protected TreeTraverser(N root, GraphSearchStrategy<N> strategy){
+    protected TreeTraverser(N root, Function<N, Iterator<N>> broadcaster, GraphSearchStrategy<N> strategy){
+        _broadcaster = broadcaster;
         _nodes = new ArrayDeque<>();
         _strategy = strategy;
         _root = root;
@@ -33,9 +37,17 @@ public class TreeTraverser<N extends Iterable<N>> implements Iterator<N> {
      * @param <T> Type of root. Must be iterable to have access its children
      * @return GraphIterator<T> based fromEntries the given parameters
      */
-    public static <T extends Iterable<T>> TreeTraverser<T> of(T source, @NotNull GraphSearchStrategy<T> strategy){
+    public static <T extends Iterable<T>> TreeTraverser<T> of(@Nullable T source, @NotNull GraphSearchStrategy<T> strategy){
         Contract.checkNull(strategy);
-        return new TreeTraverser<>(source, strategy);
+        return new TreeTraverser<>(source, Iterable::iterator, strategy);
+    }
+
+    public static <T> TreeTraverser<T> of(@Nullable  T source,
+                                          @NotNull Function<T, Iterator<T>> broadcaster,
+                                          @NotNull GraphSearchStrategy<T> strategy
+    ){
+        Contract.checkNulls(strategy, broadcaster);
+        return new TreeTraverser<>(source, broadcaster, strategy);
     }
 
     @Override
@@ -55,7 +67,8 @@ public class TreeTraverser<N extends Iterable<N>> implements Iterator<N> {
         N next = _strategy.dequeue(_nodes);
 
         if (next != null) {
-            next.forEach(node -> _strategy.enqueue(_nodes, node));
+            var iterator = _broadcaster.apply(next);
+            iterator.forEachRemaining(node -> _strategy.enqueue(_nodes, node));
         }
 
         return next;

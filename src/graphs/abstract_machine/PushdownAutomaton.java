@@ -7,6 +7,8 @@ public interface PushdownAutomaton <Acc, Data> {
 
     Status process(Acc input);
 
+    Status getStatus();
+
     Data getData();
 
     enum Status {

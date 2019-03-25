@@ -45,6 +45,11 @@ public class AbstractPushMachine<Acc, Out> extends AbstractMachine<Acc, Out> imp
     }
 
     @Override
+    public Status getStatus() {
+        return _status;
+    }
+
+    @Override
     public Out getData() {
         if (_status == Status.VIOLATED) {
             throw new IllegalStateException("Cannot getData on violated machine");

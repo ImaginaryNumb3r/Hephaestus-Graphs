@@ -7,7 +7,7 @@
 
 	<groupId>net.imaginary</groupId>
 	<artifactId>hephaestus-graphs</artifactId>
-	<version>0.1</version>
+	<version>0.2</version>
 	<packaging>jar</packaging>
 
 	<name>hephaestus-graphs</name>
@@ -34,8 +34,8 @@
 		</dependency>
         <dependency>
 			<groupId>com.github.ImaginaryNumb3r</groupId>
-			<artifactId>Hephaestus-collections</artifactId>
-			<version>1.0.2</version>
+			<artifactId>Hephaestus-Collections</artifactId>
+			<version>1.0.3</version>
         </dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>

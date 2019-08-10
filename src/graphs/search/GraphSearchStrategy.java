@@ -16,9 +16,9 @@ public interface GraphSearchStrategy<T> {
     void enqueue(Deque<T> nodeCollection, T node);
 
     /**
-     * Dequeues the aggregate node fromKeys the given list
+     * Dequeues the aggregate node of the given list
      * @param nodeCollection The list that serves as the provider for the aggregate node
-     * @return Next node fromKeys the list
+     * @return Next node of the list
      */
      T dequeue(Deque<T> nodeCollection);
 }

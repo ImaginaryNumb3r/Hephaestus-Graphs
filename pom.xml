@@ -35,7 +35,7 @@
         <dependency>
 			<groupId>com.github.ImaginaryNumb3r</groupId>
 			<artifactId>Hephaestus-Collections</artifactId>
-			<version>1.0.3</version>
+			<version>1.0</version>
         </dependency>
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -115,7 +115,7 @@
 		</repository>
 		<repository>
 			<id>jcenter</id>
-			<url>http://jcenter.bintray.com</url>
+			<url>https://jcenter.bintray.com</url>
 		</repository>
 	</repositories>
 </project>
